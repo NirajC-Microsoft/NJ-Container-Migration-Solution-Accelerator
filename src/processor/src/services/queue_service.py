@@ -1116,7 +1116,8 @@ class QueueMigrationService:
                     task_param=task_param,
                 )
             finally:
-                migration_processor = None
+                # migration_processor = None
+                pass
 
         except asyncio.CancelledError:
             # When cancelled, we assume stop_process has already deleted the message

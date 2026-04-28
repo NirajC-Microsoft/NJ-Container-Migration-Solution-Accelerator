@@ -180,6 +180,7 @@ var replicaRegionPairs = {
   japaneast: 'eastasia'
   northeurope: 'westeurope'
   southeastasia: 'eastasia'
+  swedencentral: 'northeurope'
   uksouth: 'westeurope'
   westeurope: 'northeurope'
 }
@@ -548,6 +549,7 @@ var cosmosDbZoneRedundantHaRegionPairs = {
   japaneast: 'australiaeast'
   northeurope: 'westeurope'
   southeastasia: 'eastasia'
+  swedencentral: 'northeurope'
   uksouth: 'westeurope'
   westeurope: 'northeurope'
 }

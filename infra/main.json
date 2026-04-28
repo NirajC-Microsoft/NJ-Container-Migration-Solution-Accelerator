@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.42.1.51946",
-      "templateHash": "11219559543155133570"
+      "templateHash": "16397830245329008833"
     }
   },
   "parameters": {
@@ -281,6 +281,7 @@
       "japaneast": "eastasia",
       "northeurope": "westeurope",
       "southeastasia": "eastasia",
+      "swedencentral": "northeurope",
       "uksouth": "westeurope",
       "westeurope": "northeurope",
       "westus3": "eastus"
@@ -327,6 +328,7 @@
       "japaneast": "australiaeast",
       "northeurope": "westeurope",
       "southeastasia": "eastasia",
+      "swedencentral": "northeurope",
       "uksouth": "westeurope",
       "westeurope": "northeurope",
       "westus3": "eastus"
@@ -346,8 +348,8 @@
     "aiServicesName": "[if(variables('useExistingAiFoundryAiProject'), variables('aiFoundryAiServicesResourceName'), variables('aiFoundryAiServicesResourceName'))]",
     "backendContainerPort": 80,
     "backendContainerAppName": "[take(format('ca-backend-api-{0}', variables('solutionSuffix')), 32)]",
-    "frontEndContainerAppName": "[take(format('ca-frontend-{0}', variables('solutionSuffix')), 32)]",
-    "processorContainerAppName": "[take(format('ca-processor-{0}', variables('solutionSuffix')), 32)]"
+    "processorContainerAppName": "[take(format('ca-processor-{0}', variables('solutionSuffix')), 32)]",
+    "frontEndContainerAppName": "[take(format('ca-frontend-{0}', variables('solutionSuffix')), 32)]"
   },
   "resources": {
     "existingLogAnalyticsWorkspace": {
@@ -39318,7 +39320,7 @@
               {
                 "name": "backend-api",
                 "image": "[format('{0}/backend-api:{1}', parameters('containerRegistryHost'), parameters('imageTag'))]",
-                "env": "[concat(createArray(createObject('name', 'APP_CONFIGURATION_URL', 'value', reference('appConfiguration').outputs.endpoint.value), createObject('name', 'AZURE_CLIENT_ID', 'value', reference('appIdentity').outputs.clientId.value)), if(parameters('enableMonitoring'), createArray(createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference('applicationInsights').outputs.connectionString.value)), createArray()))]",
+                "env": "[concat(createArray(createObject('name', 'APP_CONFIGURATION_URL', 'value', reference('appConfiguration').outputs.endpoint.value), createObject('name', 'AZURE_CLIENT_ID', 'value', reference('appIdentity').outputs.clientId.value), createObject('name', 'PROCESSOR_CONTROL_URL', 'value', format('https://{0}.internal.{1}', variables('processorContainerAppName'), reference('containerAppsEnvironment').outputs.defaultDomain.value))), if(parameters('enableMonitoring'), createArray(createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference('applicationInsights').outputs.connectionString.value)), createArray()))]",
                 "resources": {
                   "cpu": 1,
                   "memory": "2.0Gi"
@@ -42613,7 +42615,7 @@
               {
                 "name": "processor",
                 "image": "[format('{0}/processor:{1}', parameters('containerRegistryHost'), parameters('imageTag'))]",
-                "env": "[concat(createArray(createObject('name', 'APP_CONFIGURATION_URL', 'value', reference('appConfiguration').outputs.endpoint.value), createObject('name', 'AZURE_CLIENT_ID', 'value', reference('appIdentity').outputs.clientId.value), createObject('name', 'AZURE_STORAGE_ACCOUNT_NAME', 'value', reference('storageAccount').outputs.name.value), createObject('name', 'STORAGE_ACCOUNT_NAME', 'value', reference('storageAccount').outputs.name.value)), if(parameters('enableMonitoring'), createArray(createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference('applicationInsights').outputs.connectionString.value)), createArray()))]",
+                "env": "[concat(createArray(createObject('name', 'APP_CONFIGURATION_URL', 'value', reference('appConfiguration').outputs.endpoint.value), createObject('name', 'AZURE_CLIENT_ID', 'value', reference('appIdentity').outputs.clientId.value), createObject('name', 'AZURE_STORAGE_ACCOUNT_NAME', 'value', reference('storageAccount').outputs.name.value), createObject('name', 'STORAGE_ACCOUNT_NAME', 'value', reference('storageAccount').outputs.name.value), createObject('name', 'CONTROL_API_ENABLED', 'value', '1'), createObject('name', 'CONTROL_API_PORT', 'value', '8080')), if(parameters('enableMonitoring'), createArray(createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference('applicationInsights').outputs.connectionString.value)), createArray()))]",
                 "resources": {
                   "cpu": 2,
                   "memory": "4.0Gi"
@@ -42621,14 +42623,14 @@
               }
             ]
           },
-          "ingressTransport": {
-            "value": null
-          },
-          "disableIngress": {
-            "value": true
+          "ingressTargetPort": {
+            "value": 8080
           },
           "ingressExternal": {
             "value": false
+          },
+          "ingressAllowInsecure": {
+            "value": true
           },
           "scaleSettings": {
             "value": {
